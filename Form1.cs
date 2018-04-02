@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using WMPLib;
+using Tulpep.NotificationWindow;
+
+namespace Alarme
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        public string str = "";
+        public Boolean flag = true;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            DateTime dt = DateTime.Now;
+            this.label1.Text = dt.ToLongTimeString();
+            if (str == dt.ToLongTimeString() && flag == true)
+            {
+                flag = false;
+                WindowsMediaPlayer player = new WindowsMediaPlayer();
+                player.URL = "alarm_clock_2015.mp3";
+                player.controls.play();
+                MessageBox.Show("Wake up!!");
+
+                reset_button.Visible = false;
+                set_maskedTextBox1.ReadOnly = false;
+                player.controls.stop();
+                set_butten.Visible = true;
+                set_maskedTextBox1.Clear();
+
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            timer1.Start();
+        }
+
+        private void set_butten_Click(object sender, EventArgs e)
+        {
+            str = set_maskedTextBox1.Text + ":00";
+            set_maskedTextBox1.ReadOnly = true;
+            DateTime dt = DateTime.Now;
+
+            FileStream f = new FileStream("Alarm.txt", FileMode.Append);
+            StreamWriter s = new StreamWriter(f);
+            s.WriteLine(set_maskedTextBox1.Text +" - "+ dt.ToLongDateString());
+
+            s.Close();
+            f.Close();
+
+            set_butten.Visible = false;
+            reset_button.Visible = true;
+        }
+
+        private void reset_button_Click(object sender, EventArgs e)
+        {
+            set_butten.Visible = true;
+            reset_button.Visible = false;
+            set_maskedTextBox1.ReadOnly = false;
+            str = "";
+        }
+    }
+}
